@@ -427,6 +427,12 @@ int main()
 	sf::Sprite cloudSprite = sf::Sprite();
 	cloudSprite.setTexture(cloudTexture);
 
+	sf::Sprite cloudShadowSprite = sf::Sprite();
+	cloudShadowSprite.setTexture(cloudTexture);
+	//Black and half opacity:
+	cloudShadowSprite.setColor(sf::Color(0, 0, 0, 128));
+
+
 	cloudTexture.setSmooth(false);
 	mapTexture.setSmooth(false);
 
@@ -443,6 +449,13 @@ int main()
 
 	mapSprite.setScale(1 / (float)(map.getSize().x / windowX), 1 / (float)(map.getSize().x / windowX));
 	cloudSprite.setScale(1 / (float)(map.getSize().x / windowX), 1 / (float)(map.getSize().x / windowX));
+	cloudShadowSprite.setScale(1 / (float)(map.getSize().x / windowX), 1 / (float)(map.getSize().x / windowX));
+
+	bool cloudShadowsEnabled = true;
+	bool cSLastFrame = false;
+
+	//Offset the cloud shadows:
+	cloudShadowSprite.move(sf::Vector2f(1.8, 1.8));
 
 	std::cout << "Initializing window..." << std::endl;
 
@@ -457,6 +470,7 @@ int main()
 	std::cout << "E: Zoom in" << std::endl;
 	std::cout << "SHIFT: Go faster" << std::endl;
 	std::cout << "C: Toggle cloud map" << std::endl;
+	std::cout << "V: Toggle cloud shadows" << std::endl;
 	std::cout << "F5: Export map" << std::endl;
 	std::cout << "--------------------------------------------" << std::endl;
 	std::cout << "Exported maps go into /export/" << std::endl;
@@ -578,11 +592,30 @@ int main()
 			std::cout << "Done!" << std::endl;
 		}
 
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::V))
+		{
+			if (cSLastFrame == false)
+			{
+				cloudShadowsEnabled = !cloudShadowsEnabled;
+				cSLastFrame = true;
+			}
+		}
+		else
+		{
+			cSLastFrame = false;
+		}
+
 		window.clear();
 		window.setView(view);
 		window.draw(mapSprite);
-		if(drawCloud)
+		if (drawCloud)
+		{
+			if (cloudShadowsEnabled)
+			{
+				window.draw(cloudShadowSprite);
+			}
 			window.draw(cloudSprite);
+		}
 		window.display();
 
 		dt = dtC.restart();
